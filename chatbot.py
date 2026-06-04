@@ -130,7 +130,14 @@ class MaharahKitabahChatbot:
             response.raise_for_status()
             
             data = response.json()
-            assistant_message = data["choices"][0]["message"]["content"]
+            
+            # B.AI returns {"text": "..."} instead of OpenAI's {"choices": [{"message": {"content": "..."}}]}
+            if "text" in data:
+                assistant_message = data["text"]
+            elif "choices" in data:
+                assistant_message = data["choices"][0]["message"]["content"]
+            else:
+                assistant_message = str(data)
             
             # Simpan ke history
             self.conversation_history.append({"role": "user", "content": user_message})
